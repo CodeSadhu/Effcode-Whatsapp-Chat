@@ -2,7 +2,8 @@
     package="com.example.whatsapp_sobot_demo">
     <!-- Required to fetch data from the internet. -->
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
    <application
         android:label="whatsapp_sobot_demo"
         android:name="${applicationName}"

@@ -1,7 +1,11 @@
 import 'dart:convert';
+// import 'dart:html';
 
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
@@ -65,6 +69,42 @@ class _ChatScreenState extends State<ChatScreen> {
         _scrollToBottom();
       });
     });
+  }
+
+  uploadFile() async {
+    FilePickerResult? fileResult = await FilePicker.platform.pickFiles();
+    if (fileResult != null) {
+      PlatformFile file = fileResult.files.first;
+      // print("File selected: $file");
+      Dio dio = Dio();
+      try {
+        FormData formData = FormData.fromMap({
+          "image": await MultipartFile.fromFile(
+            file.path!,
+            filename: file.name,
+            contentType: MediaType('image', 'jpg'),
+          ),
+          'type': 'image/jpg'
+        });
+        Response resp = await dio.post(
+          'https://sobot-assets.s3.amazonaws.com',
+          data: formData,
+          options: Options(headers: {
+            'key': '/images/first_1.jpg',
+            'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+            'x-amz-credential':
+                'AKIAR6WSBXNMI6ZSOHXT/20220617/us-east-1/s3/aws4_request',
+            'x-amz-date': '20220617T111757Z',
+            'policy':
+                'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMTdUMTE6MjI6NTdaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTcvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MTdUMTExNzU3WiJ9XX0=',
+            'x-amz-signature':
+                '0774a107482975c68be14308dfe76e053870eb2e52a4e0a23845fd347ce0a5e1'
+          }),
+        );
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   Future<http.Response> fetchMessages() async {
@@ -195,7 +235,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            uploadFile();
+                          },
                           icon: const Icon(Icons.attach_file),
                         ),
                       ],
