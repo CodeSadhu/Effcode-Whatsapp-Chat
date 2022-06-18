@@ -71,38 +71,106 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  uploadFile() async {
-    FilePickerResult? fileResult = await FilePicker.platform.pickFiles();
+  uploadFile(fileType) async {
+    FilePickerResult? fileResult =
+        await FilePicker.platform.pickFiles(type: fileType);
     if (fileResult != null) {
       PlatformFile file = fileResult.files.first;
       // print("File selected: $file");
       Dio dio = Dio();
       try {
+        // FormData formData = FormData.fromMap({
+        //   "image": await MultipartFile.fromFile(
+        //     file.path!,
+        //     filename: file.name,
+        //     contentType: MediaType('image', 'jpg'),
+        //   ),
+        //   'type': 'image/jpg'
+        // });
         FormData formData = FormData.fromMap({
-          "image": await MultipartFile.fromFile(
-            file.path!,
-            filename: file.name,
-            contentType: MediaType('image', 'jpg'),
-          ),
-          'type': 'image/jpg'
-        });
-        Response resp = await dio.post(
-          'https://sobot-assets.s3.amazonaws.com',
-          data: formData,
-          options: Options(headers: {
+          // 'file': await MultipartFile.fromFile(file.path!, filename: file.name),
+          'files': [
+            await MultipartFile.fromFile(file.path!,
+                filename: file.name, contentType: MediaType('image', 'jpg')),
+          ],
+          'fields': {
             'key': '/images/first_1.jpg',
             'x-amz-algorithm': 'AWS4-HMAC-SHA256',
             'x-amz-credential':
-                'AKIAR6WSBXNMI6ZSOHXT/20220617/us-east-1/s3/aws4_request',
-            'x-amz-date': '20220617T111757Z',
+                'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request',
+            'x-amz-date': '20220618T091445Z',
             'policy':
-                'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMTdUMTE6MjI6NTdaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTcvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MTdUMTExNzU3WiJ9XX0=',
+                'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMThUMTA6MDQ6NDVaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTgvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MThUMDkxNDQ1WiJ9XX0=',
             'x-amz-signature':
-                '0774a107482975c68be14308dfe76e053870eb2e52a4e0a23845fd347ce0a5e1'
-          }),
+                '0cf09d5c1de94d902b4400efd77a9b385397de4de0104bf8a6fc16e852d14d9a'
+          }
+        });
+        var response = await dio.post(
+          'https://sobot-assets.s3.amazonaws.com/',
+          data: formData,
+          // options: Options(
+          //   headers: {
+          //     'fields': {
+          //       'key': '/images/first_1.jpg',
+          //       'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+          //       'x-amz-credential':
+          //           'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request',
+          //       'x-amz-date': '20220618T091445Z',
+          //       'policy':
+          //           'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMThUMTA6MDQ6NDVaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTgvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MThUMDkxNDQ1WiJ9XX0=',
+          //       'x-amz-signature':
+          //           '0cf09d5c1de94d902b4400efd77a9b385397de4de0104bf8a6fc16e852d14d9a'
+          //     }
+          //   },
+          // ),
         );
-      } catch (e) {
-        print(e);
+        print('Dio response: $response');
+
+        // var url = Uri.parse('https://sobot-assets.s3.amazonaws.com/');
+        // var request = http.MultipartRequest("POST", url);
+        // request.fields['key'] = '/images/first_1.jpg';
+        // request.fields['x-amz-algorithm'] = 'AWS4-HMAC-SHA256';
+        // request.fields['x-amz-credential'] = 'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request';
+        // request.files.add(http.MultipartFile(field, stream, length));
+        // request.send().then((response) {
+        //   if (response.statusCode == 200) print("Uploaded!");
+        // });
+
+        // Response resp = await dio.post('https://sobot-assets.s3.amazonaws.com/',
+        //     data: formData,
+        //     options: Options(headers: {
+        //       'conditions': [
+        //         {'key': '/images/first_1.jpg'},
+        //         {'x-amz-algorithm': 'AWS4-HMAC-SHA256'},
+        //         {
+        //           'x-amz-credential':
+        //               'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request'
+        //         },
+        //         {'x-amz-date': '20220618T091445Z'},
+        //         {
+        //           'policy':
+        //               'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMThUMTA6MDQ6NDVaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTgvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MThUMDkxNDQ1WiJ9XX0='
+        //         },
+        //         {
+        //           'x-amz-signature':
+        //               '0cf09d5c1de94d902b4400efd77a9b385397de4de0104bf8a6fc16e852d14d9a'
+        //         }
+        //       ]
+        //     })
+        //     // options: Options(headers: {
+        //     //   'key': '/images/first_1.jpg',
+        //     //   'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+        //     //   'x-amz-credential':
+        //     //       'AKIAR6WSBXNMI6ZSOHXT/20220617/us-east-1/s3/aws4_request',
+        //     //   'x-amz-date': '20220617T111757Z',
+        //     //   'policy':
+        //     //       'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMTdUMTE6MjI6NTdaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTcvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MTdUMTExNzU3WiJ9XX0=',
+        //     //   'x-amz-signature':
+        //     //       '0774a107482975c68be14308dfe76e053870eb2e52a4e0a23845fd347ce0a5e1'
+        //     // }),
+        //     );
+      } on DioError catch (e) {
+        print('Dio error: ${e.error}');
       }
     }
   }
@@ -124,7 +192,7 @@ class _ChatScreenState extends State<ChatScreen> {
       replyMsgs.add(item['message']);
     }
     setState(() {});
-    // print(httpUrl);
+    // print(httpUrl);.0
     return response;
   }
 
@@ -236,7 +304,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       children: [
                         IconButton(
                           onPressed: () async {
-                            uploadFile();
+                            // displayFilePicker()
+                            showFilePicker();
                           },
                           icon: const Icon(Icons.attach_file),
                         ),
@@ -277,6 +346,99 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  Future<dynamic> showFilePicker() {
+    return showModalBottomSheet(
+        barrierColor: Colors.transparent,
+        backgroundColor: Colors.grey[800],
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            10,
+          ),
+        ),
+        constraints: const BoxConstraints(
+          maxHeight: 300,
+          maxWidth: double.infinity,
+        ),
+        context: context,
+        builder: (ctx) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 5.0),
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FloatingActionButton(
+                      backgroundColor: Colors.purple[400],
+                      child: const Icon(
+                        Icons.image,
+                      ),
+                      onPressed: () {
+                        uploadFile(FileType.image);
+                      },
+                    ),
+                    const SizedBox(
+                      height: 5.0,
+                    ),
+                    const Text(
+                      'Image',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FloatingActionButton(
+                      backgroundColor: Colors.purple[900],
+                      child: const Icon(Icons.play_circle),
+                      onPressed: () {
+                        uploadFile(FileType.video);
+                      },
+                    ),
+                    const SizedBox(
+                      height: 5.0,
+                    ),
+                    const Text(
+                      'Video',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FloatingActionButton(
+                      backgroundColor: Colors.green[700],
+                      child: const Icon(
+                        Icons.file_copy,
+                      ),
+                      onPressed: () {
+                        uploadFile(FileType.custom);
+                      },
+                    ),
+                    const SizedBox(
+                      height: 5.0,
+                    ),
+                    const Text(
+                      'Document',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   AppBar buildAppBar() {
