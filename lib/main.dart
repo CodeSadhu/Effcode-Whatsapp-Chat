@@ -1,15 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 // import 'dart:html';
 
-import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'package:whatsapp_sobot_demo/models/request_message.dart';
+import 'package:whatsapp_sobot_demo/widgets/image_preview.dart';
 import 'package:whatsapp_sobot_demo/widgets/message_widget.dart';
 import 'package:whatsapp_sobot_demo/widgets/reply_widget.dart';
 
@@ -72,13 +73,15 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   uploadFile(fileType) async {
-    FilePickerResult? fileResult =
-        await FilePicker.platform.pickFiles(type: fileType);
-    if (fileResult != null) {
-      PlatformFile file = fileResult.files.first;
-      // print("File selected: $file");
-      Dio dio = Dio();
-      try {
+    if (fileType != FileType.image) {
+      FilePickerResult? fileResult =
+          await FilePicker.platform.pickFiles(type: fileType);
+      if (fileResult != null) {
+        PlatformFile file = fileResult.files.first;
+
+        // print("File selected: $file");
+        // Dio dio = Dio();
+        // try {
         // FormData formData = FormData.fromMap({
         //   "image": await MultipartFile.fromFile(
         //     file.path!,
@@ -87,44 +90,44 @@ class _ChatScreenState extends State<ChatScreen> {
         //   ),
         //   'type': 'image/jpg'
         // });
-        FormData formData = FormData.fromMap({
-          // 'file': await MultipartFile.fromFile(file.path!, filename: file.name),
-          'files': [
-            await MultipartFile.fromFile(file.path!,
-                filename: file.name, contentType: MediaType('image', 'jpg')),
-          ],
-          'fields': {
-            'key': '/images/first_1.jpg',
-            'x-amz-algorithm': 'AWS4-HMAC-SHA256',
-            'x-amz-credential':
-                'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request',
-            'x-amz-date': '20220618T091445Z',
-            'policy':
-                'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMThUMTA6MDQ6NDVaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTgvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MThUMDkxNDQ1WiJ9XX0=',
-            'x-amz-signature':
-                '0cf09d5c1de94d902b4400efd77a9b385397de4de0104bf8a6fc16e852d14d9a'
-          }
-        });
-        var response = await dio.post(
-          'https://sobot-assets.s3.amazonaws.com/',
-          data: formData,
-          // options: Options(
-          //   headers: {
-          //     'fields': {
-          //       'key': '/images/first_1.jpg',
-          //       'x-amz-algorithm': 'AWS4-HMAC-SHA256',
-          //       'x-amz-credential':
-          //           'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request',
-          //       'x-amz-date': '20220618T091445Z',
-          //       'policy':
-          //           'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMThUMTA6MDQ6NDVaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTgvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MThUMDkxNDQ1WiJ9XX0=',
-          //       'x-amz-signature':
-          //           '0cf09d5c1de94d902b4400efd77a9b385397de4de0104bf8a6fc16e852d14d9a'
-          //     }
-          //   },
-          // ),
-        );
-        print('Dio response: $response');
+        // FormData formData = FormData.fromMap({
+        //   // 'file': await MultipartFile.fromFile(file.path!, filename: file.name),
+        //   'files': [
+        //     await MultipartFile.fromFile(file.path!,
+        //         filename: file.name, contentType: MediaType('image', 'jpg')),
+        //   ],
+        //   'fields': {
+        //     'key': '/images/first_1.jpg',
+        //     'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+        //     'x-amz-credential':
+        //         'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request',
+        //     'x-amz-date': '20220618T091445Z',
+        //     'policy':
+        //         'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMThUMTA6MDQ6NDVaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTgvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MThUMDkxNDQ1WiJ9XX0=',
+        //     'x-amz-signature':
+        //         '0cf09d5c1de94d902b4400efd77a9b385397de4de0104bf8a6fc16e852d14d9a'
+        //   }
+        // });
+        // var response = await dio.post(
+        //   'https://sobot-assets.s3.amazonaws.com/',
+        //   data: formData,
+        //   // options: Options(
+        //   //   headers: {
+        //   //     'fields': {
+        //   //       'key': '/images/first_1.jpg',
+        //   //       'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+        //   //       'x-amz-credential':
+        //   //           'AKIAR6WSBXNMI6ZSOHXT/20220618/us-east-1/s3/aws4_request',
+        //   //       'x-amz-date': '20220618T091445Z',
+        //   //       'policy':
+        //   //           'eyJleHBpcmF0aW9uIjogIjIwMjItMDYtMThUMTA6MDQ6NDVaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAic29ib3QtYXNzZXRzIn0sIHsia2V5IjogIi9pbWFnZXMvZmlyc3RfMS5qcGcifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiQUtJQVI2V1NCWE5NSTZaU09IWFQvMjAyMjA2MTgvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWRhdGUiOiAiMjAyMjA2MThUMDkxNDQ1WiJ9XX0=',
+        //   //       'x-amz-signature':
+        //   //           '0cf09d5c1de94d902b4400efd77a9b385397de4de0104bf8a6fc16e852d14d9a'
+        //   //     }
+        //   //   },
+        //   // ),
+        // );
+        // print('Dio response: $response');
 
         // var url = Uri.parse('https://sobot-assets.s3.amazonaws.com/');
         // var request = http.MultipartRequest("POST", url);
@@ -169,9 +172,18 @@ class _ChatScreenState extends State<ChatScreen> {
         //     //       '0774a107482975c68be14308dfe76e053870eb2e52a4e0a23845fd347ce0a5e1'
         //     // }),
         //     );
-      } on DioError catch (e) {
-        print('Dio error: ${e.error}');
+        // } on DioError catch (e) {
+        //   print('Dio error: ${e.error}');
+        // }
       }
+    } else {
+      final imageFile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (imageFile != null) {
+        File file = File(imageFile.path);
+        previewImage(file);
+      }
+      // previewImage(file);
     }
   }
 
@@ -344,6 +356,15 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  previewImage(File file) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => ImagePreview(filePath: file),
       ),
     );
   }
