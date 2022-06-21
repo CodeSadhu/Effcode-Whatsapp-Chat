@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class ImagePreview extends StatefulWidget {
   final File filePath;
@@ -11,9 +12,9 @@ class ImagePreview extends StatefulWidget {
 }
 
 class _ImagePreviewState extends State<ImagePreview> {
-  bool _rowVisible = false;
-  String imagePath =
-      'https://9to5mac.com/wp-content/uploads/sites/6/2021/10/Apple_MacBook-Pro_16-inch-Screen_10182021_big_carousel.jpg.large_2x.jpg?quality=82&strip=all&w=1538';
+  bool _rowVisible = true;
+  // String imagePath =
+  //     'https://9to5mac.com/wp-content/uploads/sites/6/2021/10/Apple_MacBook-Pro_16-inch-Screen_10182021_big_carousel.jpg.large_2x.jpg?quality=82&strip=all&w=1538';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,10 +52,25 @@ class _ImagePreviewState extends State<ImagePreview> {
                       padding: const EdgeInsets.all(8),
                       child: IconButton(
                         onPressed: () async {
-                          // CroppedFile? croppedFile = await ImageCropper()
-                          //     .cropImage(
-                          //         sourcePath: widget.filePath!,
-                          //         cropStyle: CropStyle.rectangle);
+                          CroppedFile? croppedFile =
+                              await ImageCropper().cropImage(
+                            sourcePath: widget.filePath.path,
+                            // aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+                            compressQuality: 100,
+                            maxHeight: 700,
+                            cropStyle: CropStyle.rectangle,
+                            uiSettings: [
+                              AndroidUiSettings(
+                                toolbarTitle: 'Cropper',
+                                toolbarColor: Colors.deepOrange,
+                                toolbarWidgetColor: Colors.white,
+                                initAspectRatio: CropAspectRatioPreset.original,
+                                lockAspectRatio: false,
+                              ),
+                            ],
+                            maxWidth: 700,
+                            compressFormat: ImageCompressFormat.jpg,
+                          );
                         },
                         icon: const Icon(
                           Icons.crop,
@@ -67,7 +83,15 @@ class _ImagePreviewState extends State<ImagePreview> {
                 ),
               ),
               const SizedBox(height: 80),
-              Image.file(widget.filePath, fit: BoxFit.cover)
+              Expanded(
+                flex: 2,
+                child: Image.file(
+                  widget.filePath,
+                  height: MediaQuery.of(context).size.height,
+                  width: double.infinity,
+                  fit: BoxFit.fitWidth,
+                ),
+              )
             ],
           ),
         ),

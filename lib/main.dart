@@ -56,6 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final List<dynamic> replyMsgs = [];
   final ScrollController _scrollController = ScrollController();
+  bool _modalVisible = false;
 
   @override
   void initState() {
@@ -237,6 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: buildMessages(),
           ),
+          if (_modalVisible) ModalFilePicker(),
           buildBottomSection(),
         ],
       ),
@@ -245,6 +247,93 @@ class _ChatScreenState extends State<ChatScreen> {
 
   _scrollToBottom() {
     _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+  }
+
+  Widget ModalFilePicker() {
+    return AnimatedScale(
+      scale: _modalVisible ? 1 : 0,
+      duration: Duration(milliseconds: 100),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.all(15.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(
+            10,
+          ),
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  backgroundColor: Colors.purple[400],
+                  child: const Icon(
+                    Icons.image,
+                  ),
+                  onPressed: () {
+                    uploadFile(FileType.image);
+                  },
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Text(
+                  'Image',
+                  style: TextStyle(color: Colors.grey[800], fontSize: 12),
+                ),
+              ],
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  backgroundColor: Colors.purple[900],
+                  child: const Icon(Icons.play_circle),
+                  onPressed: () {
+                    uploadFile(FileType.video);
+                  },
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Text(
+                  'Video',
+                  style: TextStyle(color: Colors.grey[800], fontSize: 12),
+                ),
+              ],
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  backgroundColor: Colors.green[700],
+                  child: const Icon(
+                    Icons.file_copy,
+                  ),
+                  onPressed: () {
+                    uploadFile(FileType.custom);
+                  },
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Text(
+                  'Document',
+                  style: TextStyle(color: Colors.grey[800], fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   ListView buildMessages() {
@@ -317,7 +406,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         IconButton(
                           onPressed: () async {
                             // displayFilePicker()
-                            showFilePicker();
+                            // showFilePicker();
+                            setState(() {
+                              _modalVisible = !_modalVisible;
+                            });
                           },
                           icon: const Icon(Icons.attach_file),
                         ),
@@ -372,7 +464,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<dynamic> showFilePicker() {
     return showModalBottomSheet(
         barrierColor: Colors.transparent,
-        backgroundColor: Colors.grey[800],
+        backgroundColor: Colors.white,
+        enableDrag: true,
         elevation: 5,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
