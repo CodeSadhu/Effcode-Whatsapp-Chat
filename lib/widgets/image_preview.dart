@@ -82,16 +82,22 @@ class _ImagePreviewState extends State<ImagePreview> {
                   ],
                 ),
               ),
-              const SizedBox(height: 80),
+              // const SizedBox(height: 50),
               Expanded(
-                flex: 2,
-                child: Image.file(
-                  widget.filePath,
-                  height: MediaQuery.of(context).size.height,
-                  width: double.infinity,
-                  fit: BoxFit.fitWidth,
+                flex: 1,
+                child: Center(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height / 2,
+                    width: double.infinity,
+                    child: Image.file(
+                      widget.filePath,
+                      // height: MediaQuery.of(context).size.height,
+                      // width: double.infinity,
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),

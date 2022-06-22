@@ -336,38 +336,27 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  ListView buildMessages() {
-    // List<Widget> widgetList = [];
-
-    // for (String reply in replyMsgs) {
-    //   // print(item);
-    //   // jsonDecode(item);
-    //   // print('decoded ${item.runtimeType}');
-    //   widgetList.add(
-    //     ReplyWidget(
-    //       msg: reply,
-    //     ),
-    //   );
-    //   widgetList.add(
-    //     MessageWidget(
-    //       msg: reply,
-    //     ),
-    //   );
-    // }
-
-    return ListView.builder(
-      shrinkWrap: true,
-      // reverse: true,
-      scrollDirection: Axis.vertical,
-      itemCount: replyMsgs.length,
-      controller: _scrollController,
-      padding: const EdgeInsets.only(bottom: 50),
-      itemBuilder: (context, index) {
-        _scrollToBottom();
-        return index.isOdd
-            ? MessageWidget(msg: replyMsgs[index])
-            : ReplyWidget(msg: replyMsgs[index]);
+  Widget buildMessages() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _modalVisible = false;
+        });
       },
+      child: ListView.builder(
+        shrinkWrap: true,
+        // reverse: true,
+        scrollDirection: Axis.vertical,
+        itemCount: replyMsgs.length,
+        controller: _scrollController,
+        padding: const EdgeInsets.only(bottom: 50),
+        itemBuilder: (context, index) {
+          _scrollToBottom();
+          return index.isOdd
+              ? MessageWidget(msg: replyMsgs[index])
+              : ReplyWidget(msg: replyMsgs[index]);
+        },
+      ),
     );
   }
 
