@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 // import 'dart:html';
-
+import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,7 +41,8 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
   static const conversationID = 79;
   static const httpUrl =
       'http://sobot-env.eba-ceyv8psy.ap-south-1.elasticbeanstalk.com';
@@ -54,6 +55,8 @@ class _ChatScreenState extends State<ChatScreen> {
   );
   final FocusNode focusNode = FocusNode();
   final TextEditingController _textController = TextEditingController();
+  late AnimationController _animationController;
+  late Animation<double> animation;
   final List<dynamic> replyMsgs = [];
   final ScrollController _scrollController = ScrollController();
   bool _modalVisible = false;
@@ -61,6 +64,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 400),
+    );
+    animation =
+        CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
     fetchMessages();
     socket.stream.listen((data) {
       RequestMessageModel reqModel =
@@ -238,7 +247,15 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: buildMessages(),
           ),
-          if (_modalVisible) ModalFilePicker(),
+          // if (_modalVisible)
+          CircularRevealAnimation(
+            animation: animation,
+            centerAlignment: Alignment.bottomCenter,
+            // centerOffset: Offset(130, 100),
+            maxRadius: 500,
+            minRadius: 0,
+            child: ModalFilePicker(),
+          ),
           buildBottomSection(),
         ],
       ),
@@ -250,88 +267,84 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget ModalFilePicker() {
-    return AnimatedScale(
-      scale: _modalVisible ? 1 : 0,
-      duration: Duration(milliseconds: 100),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10),
-        padding: const EdgeInsets.all(15.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            10,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.all(15.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          10,
+        ),
+        color: Colors.white,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FloatingActionButton(
+                backgroundColor: Colors.purple[400],
+                child: const Icon(
+                  Icons.image,
+                ),
+                onPressed: () {
+                  uploadFile(FileType.image);
+                },
+              ),
+              const SizedBox(
+                height: 5.0,
+              ),
+              Text(
+                'Image',
+                style: TextStyle(color: Colors.grey[800], fontSize: 12),
+              ),
+            ],
           ),
-          color: Colors.white,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FloatingActionButton(
-                  backgroundColor: Colors.purple[400],
-                  child: const Icon(
-                    Icons.image,
-                  ),
-                  onPressed: () {
-                    uploadFile(FileType.image);
-                  },
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FloatingActionButton(
+                backgroundColor: Colors.purple[900],
+                child: const Icon(Icons.play_circle),
+                onPressed: () {
+                  uploadFile(FileType.video);
+                },
+              ),
+              const SizedBox(
+                height: 5.0,
+              ),
+              Text(
+                'Video',
+                style: TextStyle(color: Colors.grey[800], fontSize: 12),
+              ),
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FloatingActionButton(
+                backgroundColor: Colors.green[700],
+                child: const Icon(
+                  Icons.file_copy,
                 ),
-                const SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  'Image',
-                  style: TextStyle(color: Colors.grey[800], fontSize: 12),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FloatingActionButton(
-                  backgroundColor: Colors.purple[900],
-                  child: const Icon(Icons.play_circle),
-                  onPressed: () {
-                    uploadFile(FileType.video);
-                  },
-                ),
-                const SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  'Video',
-                  style: TextStyle(color: Colors.grey[800], fontSize: 12),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FloatingActionButton(
-                  backgroundColor: Colors.green[700],
-                  child: const Icon(
-                    Icons.file_copy,
-                  ),
-                  onPressed: () {
-                    uploadFile(FileType.custom);
-                  },
-                ),
-                const SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  'Document',
-                  style: TextStyle(color: Colors.grey[800], fontSize: 12),
-                ),
-              ],
-            ),
-          ],
-        ),
+                onPressed: () {
+                  uploadFile(FileType.custom);
+                },
+              ),
+              const SizedBox(
+                height: 5.0,
+              ),
+              Text(
+                'Document',
+                style: TextStyle(color: Colors.grey[800], fontSize: 12),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -399,6 +412,13 @@ class _ChatScreenState extends State<ChatScreen> {
                             setState(() {
                               _modalVisible = !_modalVisible;
                             });
+                            if (_animationController.status ==
+                                    AnimationStatus.forward ||
+                                _animationController.status ==
+                                    AnimationStatus.completed)
+                              _animationController.reverse();
+                            else
+                              _animationController.forward();
                           },
                           icon: const Icon(Icons.attach_file),
                         ),
