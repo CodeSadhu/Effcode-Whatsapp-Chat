@@ -66,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 400),
+      duration: Duration(milliseconds: 300),
     );
     animation =
         CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
@@ -187,12 +187,13 @@ class _ChatScreenState extends State<ChatScreen>
         // }
       }
     } else {
-      final imageFile =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (imageFile != null) {
-        File file = File(imageFile.path);
-        previewImage(file);
-      }
+      final imageFile = await ImagePicker().pickMultiImage().then((xfileArray) {
+        previewImage(xfileArray!);
+      });
+      // if (imageFile != null) {
+      //   File file = File(imageFile.path);
+      //   previewImage(file);
+      // }
       // previewImage(file);
     }
   }
@@ -352,9 +353,8 @@ class _ChatScreenState extends State<ChatScreen>
   Widget buildMessages() {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _modalVisible = false;
-        });
+        // if (_animationController.status == AnimationStatus.forward)
+        _animationController.reverse();
       },
       child: ListView.builder(
         shrinkWrap: true,
@@ -406,6 +406,12 @@ class _ChatScreenState extends State<ChatScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.note_add,
+                          ),
+                        ),
+                        IconButton(
                           onPressed: () async {
                             // displayFilePicker()
                             // showFilePicker();
@@ -420,7 +426,10 @@ class _ChatScreenState extends State<ChatScreen>
                             else
                               _animationController.forward();
                           },
-                          icon: const Icon(Icons.attach_file),
+                          icon: const Icon(
+                            Icons.attach_file,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -461,11 +470,15 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  previewImage(File file) {
+  previewImage(List<XFile> xfileArray) {
+    List<File> convertedFileArray = [];
+    xfileArray.forEach((element) {
+      convertedFileArray.add(File(element.path));
+    });
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => ImagePreview(filePath: file),
+        builder: (ctx) => ImagePreview(fileArray: convertedFileArray),
       ),
     );
   }
