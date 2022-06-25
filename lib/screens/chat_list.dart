@@ -7,6 +7,7 @@ import 'package:whatsapp_sobot_demo/common/fonts.dart';
 import 'package:whatsapp_sobot_demo/common/links.dart';
 import 'package:whatsapp_sobot_demo/common/lists.dart';
 import 'package:whatsapp_sobot_demo/common/tokens.dart';
+import 'package:whatsapp_sobot_demo/screens/chat_screen.dart';
 import 'package:whatsapp_sobot_demo/widgets/chat_list_tile.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -18,16 +19,41 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   late SharedPreferences prefs;
+  late List chatList = [];
+  Dio dio = Dio();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    //
     getAccessToken();
+    // THIS API CALL ABOVE IS VITAL FOR EVERY OTHER API CALL TO BE MADE THROUGHOUT THE APP FURTHER
+    //
+  }
+
+  getConversations() async {
+    Response response = await dio.get(
+      httpUrl + getAllConversations,
+      options: Options(headers: {
+        'Authorization': 'JWT $accessToken',
+      }),
+    );
+    if (response.statusCode == 200) {
+      var body = response.data['data'];
+      setState(() {
+        chatList = body;
+      });
+      chatList.forEach((element) {
+        print((element['contact'])['name']);
+      });
+      // var item = body[0];
+      // var name = (item['contact'])['name'];
+      // print('Get conversations body: $body');
+    }
   }
 
   getAccessToken() async {
     prefs = await SharedPreferences.getInstance();
-    Dio dio = Dio();
     Response response = await dio.put(
       httpUrl + verifyOtp,
       data: {
@@ -38,8 +64,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
     if (response.statusCode == 200) {
       var body = response.data;
       accessToken = (body['token'])['access'];
-      // print('Access Token: $token');
+      print('Access Token: $accessToken');
       prefs.setString('accessToken', accessToken.toString());
+      getConversations();
     }
   }
 
@@ -57,20 +84,32 @@ class _ChatListScreenState extends State<ChatListScreen> {
         child: ListView.builder(
           itemCount: chatList.length,
           itemBuilder: (ctx, index) {
-            return Column(
-              children: [
-                ChatListTile(
-                  username: chatList[index],
-                  time: '8:26pm',
-                ),
-                Divider(
-                  color: Colors.grey[300],
-                  thickness: 1,
-                  indent: 51,
-                  endIndent: 27,
-                  height: 0,
-                ),
-              ],
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (ctx) => ChatScreen(
+                      chatUserData: chatList[index],
+                    ),
+                  ),
+                );
+              },
+              child: Column(
+                children: [
+                  ChatListTile(
+                    username: ((chatList[index])['contact'])['name'].toString(),
+                    time: '8:26pm',
+                  ),
+                  Divider(
+                    color: Colors.grey[300],
+                    thickness: 1,
+                    indent: 51,
+                    endIndent: 27,
+                    height: 0,
+                  ),
+                ],
+              ),
             );
           },
         ),

@@ -11,13 +11,18 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'package:whatsapp_sobot_demo/common/links.dart';
+import 'package:whatsapp_sobot_demo/common/tokens.dart';
 import 'package:whatsapp_sobot_demo/models/request_message.dart';
 import 'package:whatsapp_sobot_demo/widgets/image_preview.dart';
 import 'package:whatsapp_sobot_demo/widgets/message_widget.dart';
 import 'package:whatsapp_sobot_demo/widgets/reply_widget.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  final dynamic chatUserData;
+  const ChatScreen({
+    Key? key,
+    required this.chatUserData,
+  }) : super(key: key);
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -25,13 +30,13 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen>
     with SingleTickerProviderStateMixin {
-  static const conversationID = 79;
-  static const authToken =
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU1MzY4NjQyLCJpYXQiOjE2NTUyODIyNDIsImp0aSI6IjA1YWM3NjNhOGIzYzRlMDE5N2E4NDdhYWI5NTRhZDU3IiwidXNlcl9pZCI6M30.UcePQ30CCA_UyZgL1Mbk37eef8kHHzgaIdjjKpky6eo';
-  static const String baseUrl =
-      'ws://sobot-env.eba-ceyv8psy.ap-south-1.elasticbeanstalk.com/ws/chat/hello/?token=$authToken';
+  var conversationID;
+  // static const accessToken =
+  //     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU1MzY4NjQyLCJpYXQiOjE2NTUyODIyNDIsImp0aSI6IjA1YWM3NjNhOGIzYzRlMDE5N2E4NDdhYWI5NTRhZDU3IiwidXNlcl9pZCI6M30.UcePQ30CCA_UyZgL1Mbk37eef8kHHzgaIdjjKpky6eo';
+  // final String baseUrl =
+  //     'ws://sobot-env.eba-ceyv8psy.ap-south-1.elasticbeanstalk.com/ws/chat/hello/?token=$accessToken';
   final WebSocketChannel socket = IOWebSocketChannel.connect(
-    baseUrl,
+    webSocketUrl,
   );
   final FocusNode focusNode = FocusNode();
   final TextEditingController _textController = TextEditingController();
@@ -44,7 +49,11 @@ class _ChatScreenState extends State<ChatScreen>
   @override
   void initState() {
     super.initState();
+    //
     setToken();
+    // RETRIEVE ACCESS TOKEN IMMEDIATELY AS SOON AS THE USER COMES INTO THE CHAT SCREEN
+    //
+    conversationID = widget.chatUserData['id'];
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
@@ -64,8 +73,12 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   setToken() async {
-    authToken = await SharedPreferences.getInstance()
-        .then((value) => value.getString('accessToken'));
+    accessToken = await SharedPreferences.getInstance().then(
+      (prefs) {
+        prefs.getString('accessToken');
+      },
+    );
+    print('accessToken: $accessToken');
   }
 
   uploadFile(fileType) async {
@@ -188,7 +201,7 @@ class _ChatScreenState extends State<ChatScreen>
     var response = await http.get(
         Uri.parse(httpUrl + '/conversations/$conversationID/message/'),
         headers: {
-          'Authorization': 'JWT ' + authToken,
+          'Authorization': 'JWT ' + accessToken,
         });
     // print(response.body);
     dynamic respData = jsonDecode(response.body);
@@ -217,7 +230,7 @@ class _ChatScreenState extends State<ChatScreen>
         Uri.parse(httpUrl + '/conversations/message/'),
         body: jsonEncode(body),
         headers: {
-          'Authorization': 'JWT ' + authToken,
+          'Authorization': 'JWT ' + accessToken,
         });
     // print('Send resp: ${response.toString()}');
     return response;
@@ -576,10 +589,10 @@ class _ChatScreenState extends State<ChatScreen>
       ],
       leadingWidth: double.infinity,
       titleSpacing: 0,
-      title: const Text(
-        'Test User',
+      title: Text(
+        (widget.chatUserData['contact'])['name'],
         textAlign: TextAlign.left,
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 16,
         ),
@@ -590,11 +603,17 @@ class _ChatScreenState extends State<ChatScreen>
             icon: const Icon(
               Icons.arrow_back,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          const CircleAvatar(
+          CircleAvatar(
             child: Text(
-              'T',
+              (widget.chatUserData['contact'])['name']
+                  .toString()
+                  .characters
+                  .first
+                  .toUpperCase(),
               style: TextStyle(
                 color: Colors.white,
               ),

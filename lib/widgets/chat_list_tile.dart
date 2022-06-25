@@ -43,73 +43,135 @@ class ChatListTile extends StatelessWidget {
           Positioned(
             top: 5,
             left: 60,
-            child: Text(
-              username,
-              style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w500, fontSize: 20),
-            ),
-          ),
-          Positioned(
-            top: 5,
-            left: 120,
-            child: Container(
-              constraints: const BoxConstraints(
-                maxWidth: 200,
-              ),
-              child: Transform(
-                transform: Matrix4.identity()..scale(0.5),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    Chip(
-                      padding: EdgeInsets.all(0),
-                      labelPadding: EdgeInsets.symmetric(
-                        vertical: 0,
-                        horizontal: 15,
-                      ),
-                      label: Text(
-                        'New',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                      backgroundColor: chipColor1,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Chip(
-                      padding: EdgeInsets.all(0),
-                      labelPadding: EdgeInsets.symmetric(
-                        vertical: 0,
-                        horizontal: 5,
-                      ),
-                      label: Text(
-                        'Pending Payment',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                      backgroundColor: chipColor2,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                  ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  username,
+                  textWidthBasis: TextWidthBasis.longestLine,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 200,
+                  ),
+                  child: Transform(
+                    transform: Matrix4.identity()..scale(0.7),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: const [
+                        // Chip(
+                        //   padding: EdgeInsets.all(0),
+                        //   labelPadding: EdgeInsets.symmetric(
+                        //     vertical: 0,
+                        //     horizontal: 15,
+                        //   ),
+                        //   label: Text(
+                        //     'New',
+                        //     style: TextStyle(
+                        //       color: Colors.white,
+                        //       fontSize: 12,
+                        //     ),
+                        //   ),
+                        //   backgroundColor: chipColor1,
+                        // ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Chip(
+                          padding: EdgeInsets.all(0),
+                          labelPadding: EdgeInsets.symmetric(
+                            vertical: 0,
+                            horizontal: 5,
+                          ),
+                          label: Text(
+                            'New',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                          backgroundColor: chipColor2,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+          // Positioned(
+          //   top: 5,
+          //   left: 120,
+          //   child: Container(
+          //     constraints: const BoxConstraints(
+          //       maxWidth: 200,
+          //     ),
+          //     child: Transform(
+          //       transform: Matrix4.identity()..scale(0.6),
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         mainAxisAlignment: MainAxisAlignment.start,
+          //         children: const [
+          //           Chip(
+          //             padding: EdgeInsets.all(0),
+          //             labelPadding: EdgeInsets.symmetric(
+          //               vertical: 0,
+          //               horizontal: 15,
+          //             ),
+          //             label: Text(
+          //               'New',
+          //               style: TextStyle(
+          //                 color: Colors.white,
+          //                 fontSize: 12,
+          //               ),
+          //             ),
+          //             backgroundColor: chipColor1,
+          //           ),
+          //           SizedBox(
+          //             width: 5,
+          //           ),
+          //           Chip(
+          //             padding: EdgeInsets.all(0),
+          //             labelPadding: EdgeInsets.symmetric(
+          //               vertical: 0,
+          //               horizontal: 5,
+          //             ),
+          //             label: Text(
+          //               'Pending Payment',
+          //               style: TextStyle(
+          //                 color: Colors.white,
+          //                 fontSize: 12,
+          //               ),
+          //             ),
+          //             backgroundColor: chipColor2,
+          //           ),
+          //           SizedBox(
+          //             width: 5,
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Positioned(
             top: 40,
             left: 60,
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 190),
+              constraints: BoxConstraints(maxWidth: 200),
               child: Text(
-                'Would you like to see more products?',
+                'Would you like to see more products?????????????',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.normal,
                   color: Colors.grey,
