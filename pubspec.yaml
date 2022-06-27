@@ -46,6 +46,9 @@ dependencies:
   circular_reveal_animation: ^2.0.1
   provider: ^6.0.3
   shared_preferences: ^2.0.15
+  firebase_core: ^1.18.0
+  firebase_messaging: ^11.4.2
+  overlay_support: ^2.0.1
 
 dev_dependencies:
   flutter_test:

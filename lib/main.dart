@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
@@ -26,12 +27,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      // home: const ChatScreen(),
-      home: ChatListScreen(),
-      theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(),
+    return OverlaySupport(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        // home: const ChatScreen(),
+        home: ChatListScreen(),
+        theme: ThemeData(
+          textTheme: GoogleFonts.poppinsTextTheme(),
+        ),
       ),
     );
   }

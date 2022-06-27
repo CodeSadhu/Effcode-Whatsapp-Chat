@@ -1,14 +1,19 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whatsapp_sobot_demo/common/colors.dart';
 import 'package:whatsapp_sobot_demo/common/fonts.dart';
 import 'package:whatsapp_sobot_demo/common/links.dart';
 import 'package:whatsapp_sobot_demo/common/lists.dart';
 import 'package:whatsapp_sobot_demo/common/tokens.dart';
+import 'package:whatsapp_sobot_demo/models/push_notification.dart';
 import 'package:whatsapp_sobot_demo/screens/chat_screen.dart';
 import 'package:whatsapp_sobot_demo/widgets/chat_list_tile.dart';
+import 'package:whatsapp_sobot_demo/widgets/notification_badge.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({Key? key}) : super(key: key);
@@ -19,16 +24,21 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   late SharedPreferences prefs;
+  PushNotification? notificationInfo;
+  late int _totalNotifications;
+  late final FirebaseMessaging messaging;
   late List chatList = [];
   Dio dio = Dio();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    registerNotification();
     //
     getAccessToken();
     // THIS API CALL ABOVE IS VITAL FOR EVERY OTHER API CALL TO BE MADE THROUGHOUT THE APP FURTHER
     //
+    _totalNotifications = 0;
   }
 
   getConversations() async {
@@ -50,6 +60,60 @@ class _ChatListScreenState extends State<ChatListScreen> {
       // var name = (item['contact'])['name'];
       // print('Get conversations body: $body');
     }
+  }
+
+  displayNotification() {
+    print(
+        'Display Notification entered, notificationInfo status: ${notificationInfo!.title}');
+    if (notificationInfo != null) {
+      showSimpleNotification(
+        Text(
+          notificationInfo!.title!,
+        ),
+        leading: NotificationBadge(totalNotifications: _totalNotifications),
+        subtitle: Text(
+          notificationInfo!.body!,
+          style: TextStyle(color: Colors.white),
+        ),
+        background: Colors.purple.shade700,
+        duration: Duration(seconds: 2),
+      );
+    }
+  }
+
+  registerNotification() async {
+    await Firebase.initializeApp();
+    messaging = FirebaseMessaging.instance;
+
+    // UNCOMMENT BELOW CODE FOR iOS
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      provisional: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // setState(() {
+      //   displayNotification();
+      // });
+      print('Granted permission');
+    } else {
+      print('Permission not granted');
+    }
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage remoteMessage) {
+      PushNotification notification = PushNotification(
+        body: remoteMessage.notification?.body,
+        title: remoteMessage.notification?.title,
+      );
+      setState(() {
+        notificationInfo = notification;
+        displayNotification();
+        _totalNotifications += 1;
+      });
+    });
   }
 
   getAccessToken() async {
@@ -81,39 +145,58 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView.builder(
-          itemCount: chatList.length,
-          itemBuilder: (ctx, index) {
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (ctx) => ChatScreen(
-                      chatUserData: chatList[index],
-                    ),
-                  ),
-                );
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            IconButton(
+              onPressed: () {
+                displayNotification();
               },
-              child: Column(
-                children: [
-                  ChatListTile(
-                    key: Key('UserTile #${index.toString()}'),
-                    username: ((chatList[index])['contact'])['name'].toString(),
-                    time: '8:26pm',
-                  ),
-                  Divider(
-                    color: Colors.grey[300],
-                    thickness: 1,
-                    indent: 51,
-                    endIndent: 27,
-                    height: 0,
-                  ),
-                ],
-              ),
-            );
-          },
+              icon: Icon(Icons.notification_add),
+            ),
+            // if (_totalNotifications > 0)
+            //   Align(
+            //     child:
+            //         NotificationBadge(totalNotifications: _totalNotifications),
+            //     alignment: Alignment.center,
+            //   ),
+          ],
         ),
+        // child: ListView.builder(
+        //   itemCount: chatList.length,
+        //   itemBuilder: (ctx, index) {
+        //     return InkWell(
+        //       onTap: () {
+        //         Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (ctx) => ChatScreen(
+        //               chatUserData: chatList[index],
+        //             ),
+        //           ),
+        //         );
+        //       },
+        //       child: Column(
+        //         children: [
+        //           ChatListTile(
+        //             key: Key('UserTile #${index.toString()}'),
+        //             username: ((chatList[index])['contact'])['name'].toString(),
+        //             time: '8:26pm',
+        //           ),
+        //           Divider(
+        //             color: Colors.grey[300],
+        //             thickness: 1,
+        //             indent: 51,
+        //             endIndent: 27,
+        //             height: 0,
+        //           ),
+        //         ],
+        //       ),
+        //     );
+        //   },
+        // ),
       ),
     );
   }
