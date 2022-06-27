@@ -36,7 +36,7 @@ class _ChatScreenState extends State<ChatScreen>
   // final String baseUrl =
   //     'ws://sobot-env.eba-ceyv8psy.ap-south-1.elasticbeanstalk.com/ws/chat/hello/?token=$accessToken';
   final WebSocketChannel socket = IOWebSocketChannel.connect(
-    webSocketUrl,
+    'ws://sobot-env.eba-ceyv8psy.ap-south-1.elasticbeanstalk.com/ws/chat/hello/?token=$accessToken',
   );
   final FocusNode focusNode = FocusNode();
   final TextEditingController _textController = TextEditingController();
@@ -54,6 +54,7 @@ class _ChatScreenState extends State<ChatScreen>
     // RETRIEVE ACCESS TOKEN IMMEDIATELY AS SOON AS THE USER COMES INTO THE CHAT SCREEN
     //
     conversationID = widget.chatUserData['id'];
+    print('Conversation id: $conversationID');
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
@@ -61,24 +62,26 @@ class _ChatScreenState extends State<ChatScreen>
     animation =
         CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
     fetchMessages();
-    socket.stream.listen((data) {
-      RequestMessageModel reqModel =
-          RequestMessageModel.fromJson(jsonDecode(data));
-      // print(reqModel);
-      setState(() {
-        replyMsgs.add(reqModel.msg);
-        _scrollToBottom();
-      });
-    });
   }
 
   setToken() async {
-    accessToken = await SharedPreferences.getInstance().then(
+    await SharedPreferences.getInstance().then(
       (prefs) {
         prefs.getString('accessToken');
       },
-    );
-    print('accessToken: $accessToken');
+    ).then((token) {
+      accessToken = token.toString();
+      socket.stream.listen((data) {
+        RequestMessageModel reqModel =
+            RequestMessageModel.fromJson(jsonDecode(data));
+        // print(reqModel);
+        setState(() {
+          replyMsgs.add(reqModel.msg);
+          _scrollToBottom();
+        });
+      });
+    });
+    // print('accessToken: $accessToken');
   }
 
   uploadFile(fileType) async {
@@ -208,7 +211,7 @@ class _ChatScreenState extends State<ChatScreen>
     // print('Response Data: ${respData['data'][0]}');
     dynamic responseObject = respData['data'];
     for (dynamic item in responseObject) {
-      // print(item['message']);
+      print(item['message']);
       // RequestMessageModel reqModel =
       //     RequestMessageModel.fromJson(jsonDecode(item));
       replyMsgs.add(item['message']);
@@ -223,14 +226,14 @@ class _ChatScreenState extends State<ChatScreen>
       'raw': {
         'msessage': msg,
         'gs_msg_type': 'text',
-        'conversations_id': 75,
+        'conversations_id': conversationID,
       },
     };
     var response = await http.post(
         Uri.parse(httpUrl + '/conversations/message/'),
         body: jsonEncode(body),
         headers: {
-          'Authorization': 'JWT ' + accessToken,
+          'Authorization': 'JWT $accessToken',
         });
     // print('Send resp: ${response.toString()}');
     return response;
@@ -364,7 +367,7 @@ class _ChatScreenState extends State<ChatScreen>
         padding: const EdgeInsets.only(bottom: 50),
         itemBuilder: (context, index) {
           _scrollToBottom();
-          return index.isOdd
+          return index.isEven
               ? MessageWidget(msg: replyMsgs[index])
               : ReplyWidget(msg: replyMsgs[index]);
         },
@@ -614,7 +617,7 @@ class _ChatScreenState extends State<ChatScreen>
                   .characters
                   .first
                   .toUpperCase(),
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
               ),
             ),

@@ -1,1 +1,2 @@
-var accessToken;
+var accessToken =
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2Mzk3NjkwLCJpYXQiOjE2NTYzMTEyOTAsImp0aSI6ImIwM2U4MDJmYWEwMjQxMjFiYTc5NTM3Y2U3ZWE0M2JjIiwidXNlcl9pZCI6M30.GltkaPxPa7Y-0p6ci9j-4KpJYEAhN8qk4-cAs5q6NPE';

@@ -98,6 +98,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               child: Column(
                 children: [
                   ChatListTile(
+                    key: Key('UserTile #${index.toString()}'),
                     username: ((chatList[index])['contact'])['name'].toString(),
                     time: '8:26pm',
                   ),
