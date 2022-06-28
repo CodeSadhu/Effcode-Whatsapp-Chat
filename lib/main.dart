@@ -3,6 +3,7 @@ import 'dart:io';
 // import 'dart:html';
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,11 +14,15 @@ import 'package:http/http.dart' as http;
 import 'package:whatsapp_sobot_demo/models/request_message.dart';
 import 'package:whatsapp_sobot_demo/screens/chat_list.dart';
 import 'package:whatsapp_sobot_demo/screens/chat_screen.dart';
+import 'package:whatsapp_sobot_demo/services/notification_service.dart';
 import 'package:whatsapp_sobot_demo/widgets/image_preview.dart';
 import 'package:whatsapp_sobot_demo/widgets/message_widget.dart';
 import 'package:whatsapp_sobot_demo/widgets/reply_widget.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await NotificationService.initialize();
   runApp(const MyApp());
 }
 

@@ -33,6 +33,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getTokenFCM();
     registerNotification();
     //
     getAccessToken();
@@ -60,6 +61,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
       // var name = (item['contact'])['name'];
       // print('Get conversations body: $body');
     }
+  }
+
+  Future<void> getTokenFCM() async {
+    await FirebaseMessaging.instance.getToken().then(
+      (token) {
+        print('FCM Token: ${token}');
+      },
+    );
   }
 
   displayNotification() {
@@ -150,18 +159,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             const SizedBox(
               height: 10,
             ),
-            IconButton(
-              onPressed: () {
-                displayNotification();
-              },
-              icon: Icon(Icons.notification_add),
-            ),
-            // if (_totalNotifications > 0)
-            //   Align(
-            //     child:
-            //         NotificationBadge(totalNotifications: _totalNotifications),
-            //     alignment: Alignment.center,
-            //   ),
+            // Align(alignment: Align,)
           ],
         ),
         // child: ListView.builder(
