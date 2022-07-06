@@ -593,7 +593,7 @@ class _ChatScreenState extends State<ChatScreen>
       leadingWidth: double.infinity,
       titleSpacing: 0,
       title: Text(
-        (widget.chatUserData['contact'])['name'],
+        (widget.chatUserData['customer'])['name'],
         textAlign: TextAlign.left,
         style: const TextStyle(
           fontWeight: FontWeight.w500,
@@ -612,7 +612,7 @@ class _ChatScreenState extends State<ChatScreen>
           ),
           CircleAvatar(
             child: Text(
-              (widget.chatUserData['contact'])['name']
+              (widget.chatUserData['customer'])['name']
                   .toString()
                   .characters
                   .first

@@ -55,7 +55,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
         chatList = body;
       });
       chatList.forEach((element) {
-        print((element['contact'])['name']);
+        // print((element['customer'])['name']);
+        print(element["customer"]);
       });
       // var item = body[0];
       // var name = (item['contact'])['name'];
@@ -154,47 +155,48 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            // Align(alignment: Align,)
-          ],
-        ),
-        // child: ListView.builder(
-        //   itemCount: chatList.length,
-        //   itemBuilder: (ctx, index) {
-        //     return InkWell(
-        //       onTap: () {
-        //         Navigator.push(
-        //           context,
-        //           MaterialPageRoute(
-        //             builder: (ctx) => ChatScreen(
-        //               chatUserData: chatList[index],
-        //             ),
-        //           ),
-        //         );
-        //       },
-        //       child: Column(
-        //         children: [
-        //           ChatListTile(
-        //             key: Key('UserTile #${index.toString()}'),
-        //             username: ((chatList[index])['contact'])['name'].toString(),
-        //             time: '8:26pm',
-        //           ),
-        //           Divider(
-        //             color: Colors.grey[300],
-        //             thickness: 1,
-        //             indent: 51,
-        //             endIndent: 27,
-        //             height: 0,
-        //           ),
-        //         ],
-        //       ),
-        //     );
-        //   },
+        // child: Column(
+        //   children: [
+        //     const SizedBox(
+        //       height: 10,
+        //     ),
+        //     // Align(alignment: Align,)
+        //   ],
         // ),
+        child: ListView.builder(
+          itemCount: chatList.length,
+          itemBuilder: (ctx, index) {
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (ctx) => ChatScreen(
+                      chatUserData: chatList[index],
+                    ),
+                  ),
+                );
+              },
+              child: Column(
+                children: [
+                  ChatListTile(
+                    key: Key('UserTile #${index.toString()}'),
+                    username:
+                        ((chatList[index])['customer'])['name'].toString(),
+                    time: '8:26pm',
+                  ),
+                  Divider(
+                    color: Colors.grey[300],
+                    thickness: 1,
+                    indent: 51,
+                    endIndent: 27,
+                    height: 0,
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
